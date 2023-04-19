@@ -1,0 +1,235 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="datafile">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element type="xs:string" name="header" minOccurs="0"/>
+        <xs:element name="game" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="archive" maxOccurs="1">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute type="xs:string" name="number"/>
+                      <xs:attribute type="xs:string" name="clone"/>
+                      <xs:attribute type="xs:string" name="regparent"/>
+                      <xs:attribute type="xs:string" name="mergeof"/>
+                      <xs:attribute type="xs:string" name="mergename"/>
+                      <xs:attribute type="xs:string" name="name"/>
+                      <xs:attribute type="xs:string" name="name_alt"/>
+                      <xs:attribute type="xs:string" name="region"/>
+                      <xs:attribute type="xs:string" name="languages"/>
+                      <xs:attribute type="xs:byte" name="showlang"/>
+                      <xs:attribute type="xs:string" name="langchecked"/>
+                      <xs:attribute type="xs:string" name="version"/>
+                      <xs:attribute type="xs:string" name="devstatus"/>
+                      <xs:attribute type="xs:string" name="additional"/>
+                      <xs:attribute type="xs:string" name="special1"/>
+                      <xs:attribute type="xs:string" name="special2"/>
+                      <xs:attribute type="xs:byte" name="alt"/>
+                      <xs:attribute type="xs:string" name="gameid1"/>
+                      <xs:attribute type="xs:string" name="gameid2"/>
+                      <xs:attribute type="xs:string" name="description"/>
+                      <xs:attribute type="xs:byte" name="bios"/>
+                      <xs:attribute type="xs:byte" name="licensed"/>
+                      <xs:attribute type="xs:byte" name="pirate"/>
+                      <xs:attribute type="xs:byte" name="physical"/>
+                      <xs:attribute type="xs:byte" name="complete"/>
+                      <xs:attribute type="xs:byte" name="adult"/>
+                      <xs:attribute type="xs:byte" name="dat"/>
+                      <xs:attribute type="xs:byte" name="listed"/>
+                      <xs:attribute type="xs:string" name="sticky_note"/>
+                      <xs:attribute type="xs:string" name="datter_note"/>
+                      <xs:attribute type="xs:string" name="categories"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="media" minOccurs="0" maxOccurs="unbounded">
+              </xs:element>
+              <xs:element name="source" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="details">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute type="xs:string" name="id"/>
+                            <xs:attribute type="xs:string" name="append_to_number"/>
+                            <xs:attribute type="xs:string" name="section"/>
+                            <xs:attribute type="xs:string" name="rominfo"/>
+                            <xs:attribute type="xs:string" name="d_date"/>
+                            <xs:attribute type="xs:byte" name="d_date_info"/>
+                            <xs:attribute type="xs:string" name="r_date"/>
+                            <xs:attribute type="xs:byte" name="r_date_info"/>
+                            <xs:attribute type="xs:string" name="dumper"/>
+                            <xs:attribute type="xs:string" name="project"/>
+                            <xs:attribute type="xs:string" name="originalformat"/>
+                            <xs:attribute type="xs:byte" name="nodump"/>
+                            <xs:attribute type="xs:string" name="tool"/>
+                            <xs:attribute type="xs:string" name="origin"/>
+                            <xs:attribute type="xs:string" name="comment1"/>
+                            <xs:attribute type="xs:string" name="comment2"/>
+                            <xs:attribute type="xs:string" name="link1"/>
+                            <xs:attribute type="xs:byte" name="link1_public"/>
+                            <xs:attribute type="xs:string" name="link2"/>
+                            <xs:attribute type="xs:byte" name="link2_public"/>
+                            <xs:attribute type="xs:string" name="link3"/>
+                            <xs:attribute type="xs:byte" name="link3_public"/>
+                            <xs:attribute type="xs:string" name="region"/>
+                            <xs:attribute type="xs:string" name="media_title"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="serials" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute type="xs:string" name="media_serial1"/>
+                            <xs:attribute type="xs:string" name="media_serial2"/>
+                            <xs:attribute type="xs:string" name="media_serial3"/>
+                            <xs:attribute type="xs:string" name="pcb_serial"/>
+                            <xs:attribute type="xs:string" name="romchip_serial1"/>
+                            <xs:attribute type="xs:string" name="romchip_serial2"/>
+                            <xs:attribute type="xs:string" name="lockout_serial"/>
+                            <xs:attribute type="xs:string" name="savechip_serial"/>
+                            <xs:attribute type="xs:string" name="chip_serial"/>
+                            <xs:attribute type="xs:string" name="box_serial"/>
+                            <xs:attribute type="xs:string" name="mediastamp"/>
+                            <xs:attribute type="xs:string" name="box_barcode"/>
+                            <xs:attribute type="xs:string" name="digital_serial1"/>
+                            <xs:attribute type="xs:string" name="digital_serial2"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="file" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute type="xs:string" name="id"/>
+                            <xs:attribute type="xs:string" name="append_to_source_id"/>
+                            <xs:attribute type="xs:string" name="forcename"/>
+                            <xs:attribute type="xs:string" name="forcescenename"/>
+                            <xs:attribute type="xs:byte" name="emptydir"/>
+                            <xs:attribute type="xs:string" name="extension"/>
+                            <xs:attribute type="xs:string" name="item"/>
+                            <xs:attribute type="xs:string" name="date"/>
+                            <xs:attribute type="xs:string" name="format"/>
+                            <xs:attribute type="xs:string" name="note"/>
+                            <xs:attribute type="xs:string" name="filter"/>
+                            <xs:attribute type="xs:string" name="version"/>
+                            <xs:attribute type="xs:string" name="update_type"/>
+                            <xs:attribute type="xs:string" name="size"/>
+                            <xs:attribute type="xs:string" name="crc32"/>
+                            <xs:attribute type="xs:string" name="md5"/>
+                            <xs:attribute type="xs:string" name="sha1"/>
+                            <xs:attribute type="xs:string" name="sha256"/>
+                            <xs:attribute type="xs:string" name="serial"/>
+                            <xs:attribute type="xs:string" name="header"/>
+                            <xs:attribute type="xs:byte" name="bad"/>
+                            <xs:attribute type="xs:byte" name="mia"/>
+                            <xs:attribute type="xs:byte" name="unique"/>
+                            <xs:attribute type="xs:string" name="mergename"/>
+                            <xs:attribute type="xs:string" name="unique_attachment"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="release" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="details">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute type="xs:string" name="id"/>
+                            <xs:attribute type="xs:string" name="append_to_number"/>
+                            <xs:attribute type="xs:string" name="date"/>
+                            <xs:attribute type="xs:string" name="originalformat"/>
+                            <xs:attribute type="xs:string" name="group"/>
+                            <xs:attribute type="xs:string" name="dirname"/>
+                            <xs:attribute type="xs:string" name="nfoname"/>
+                            <xs:attribute type="xs:string" name="nfosize"/>
+                            <xs:attribute type="xs:string" name="nfocrc"/>
+                            <xs:attribute type="xs:string" name="archivename"/>
+                            <xs:attribute type="xs:string" name="rominfo"/>
+                            <xs:attribute type="xs:string" name="category"/>
+                            <xs:attribute type="xs:string" name="comment"/>
+                            <xs:attribute type="xs:string" name="tool"/>
+                            <xs:attribute type="xs:string" name="region"/>
+                            <xs:attribute type="xs:string" name="origin"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="serials" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute type="xs:string" name="media_serial1"/>
+                            <xs:attribute type="xs:string" name="media_serial2"/>
+                            <xs:attribute type="xs:string" name="media_serial3"/>
+                            <xs:attribute type="xs:string" name="pcb_serial"/>
+                            <xs:attribute type="xs:string" name="romchip_serial1"/>
+                            <xs:attribute type="xs:string" name="romchip_serial2"/>
+                            <xs:attribute type="xs:string" name="lockout_serial"/>
+                            <xs:attribute type="xs:string" name="savechip_serial"/>
+                            <xs:attribute type="xs:string" name="chip_serial"/>
+                            <xs:attribute type="xs:string" name="box_serial"/>
+                            <xs:attribute type="xs:string" name="mediastamp"/>
+                            <xs:attribute type="xs:string" name="box_barcode"/>
+                            <xs:attribute type="xs:string" name="digital_serial1"/>
+                            <xs:attribute type="xs:string" name="digital_serial2"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="file" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute type="xs:string" name="id"/>
+                            <xs:attribute type="xs:string" name="append_to_release_id"/>
+                            <xs:attribute type="xs:string" name="forcename"/>
+                            <xs:attribute type="xs:string" name="forcescenename"/>
+                            <xs:attribute type="xs:byte" name="emptydir"/>
+                            <xs:attribute type="xs:string" name="extension"/>
+                            <xs:attribute type="xs:string" name="item"/>
+                            <xs:attribute type="xs:string" name="date"/>
+                            <xs:attribute type="xs:string" name="format"/>
+                            <xs:attribute type="xs:string" name="note"/>
+                            <xs:attribute type="xs:string" name="filter"/>
+                            <xs:attribute type="xs:string" name="version"/>
+                            <xs:attribute type="xs:string" name="update_type"/>
+                            <xs:attribute type="xs:string" name="size"/>
+                            <xs:attribute type="xs:string" name="crc32"/>
+                            <xs:attribute type="xs:string" name="md5"/>
+                            <xs:attribute type="xs:string" name="sha1"/>
+                            <xs:attribute type="xs:string" name="sha256"/>
+                            <xs:attribute type="xs:string" name="serial"/>
+                            <xs:attribute type="xs:string" name="header"/>
+                            <xs:attribute type="xs:byte" name="bad"/>
+                            <xs:attribute type="xs:byte" name="mia"/>
+                            <xs:attribute type="xs:byte" name="unique"/>
+                            <xs:attribute type="xs:string" name="mergename"/>
+                            <xs:attribute type="xs:string" name="unique_attachment"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute type="xs:string" name="name"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
