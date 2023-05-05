@@ -42,5 +42,5 @@ Product ID 13 has 2 dupe(s) in the romanization CSV
 To run the datting process, use the `dat` subcommand:
 
 ```
-python main.py dat <dumper's name> <path\to\download\destination> <path\to\data.json> <path\to\romanization.csv> .
+python main.py dat <dumper's name> <path\to\download\destination> <path\to\data.json> <path\to\romanization.csv> <path\to\output\to>
 ```
