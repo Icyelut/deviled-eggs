@@ -504,6 +504,20 @@ def dat(parsed_args):
     print("Done")
 
 
+def romanize(parsed_args):
+    print("Reading romanization CSV...")
+    csv_lines = None
+    with open(parsed_args.romanized_csv, encoding="utf8") as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=",", quotechar='"')
+        csv_lines = [x for x in reader]
+
+    print("Reading server JSON...")
+    server_json = json.loads(open(parsed_args.server_json, encoding="utf8").read())
+
+    print("Checking for missing romanizations...")
+    find_missing_romanizations(server_json, csv_lines)
+
+
 def generate_file_list(json_file):
     print("Reading server JSON...")
     server_json = json.loads(open(json_file, encoding="utf8").read())
@@ -809,8 +823,16 @@ if __name__ == '__main__':
                                  help="Full path to the folder where the files should be saved")
     download_parser.set_defaults(func_to_run=download)
 
-    dat_parser = subparsers.add_parser("dat", help="No-intro dat generator")
+    romanize_parser = subparsers.add_parser("romanize", help="Romanization tools")
+    romanize_parser.add_argument("server_json", metavar="<server response JSON path>", type=is_file(True),
+                            help="Full path to the JSON response file with game metadata")
+    romanize_parser.add_argument("--romanized_csv", metavar="<romanized titles CSV path>", type=is_file(True),
+                            help="Full path to the existing CSV with romanized titles")
+    romanize_parser.add_argument("out_dir", metavar="<output XML path>", type=is_valid_new_file_location,
+                            help="Path to write the csv to")
+    romanize_parser.set_defaults(func_to_run=romanize)
 
+    dat_parser = subparsers.add_parser("dat", help="No-intro dat generator")
     dat_parser.add_argument("dumper",
                             help="Put your name!")
 
