@@ -17,6 +17,7 @@ python main.py download --server_json <path\to\data.json> <path\to\download\dest
 
 You do not need an account to download via the `data.json` file, but it may be out of date!
 
+If you run the command again, it will only download new or missing files.
 
 ## Preparing the romanization file
 
@@ -42,5 +43,6 @@ Product ID 13 has 2 dupe(s) in the romanization CSV
 To run the datting process, use the `dat` subcommand:
 
 ```
-python main.py dat <dumper's name> <path\to\download\destination> <path\to\data.json> <path\to\romanization.csv> <path\to\output\to>
+python main.py dat \
+<dumper's name> <path\to\download\destination> <path\to\data.json> <path\to\romanization.csv> <path\to\output\to>
 ```
