@@ -15,6 +15,9 @@ If you already have the metadata file `data.json`, then you can pass the path wi
 python main.py download --server_json <path\to\data.json> <path\to\download\destination>
 ```
 
+You do not need an account to download via the `data.json` file, but it may be out of date!
+
+
 ## Preparing the romanization file
 
 Use the `romanize` subcommand to generate `missing_romanizations.csv`
