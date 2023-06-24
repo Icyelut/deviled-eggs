@@ -58,7 +58,7 @@ An `egg` will be associated with an archive if:
 An `egg` is determined to be a newer release of the current `egg` if it's `productId` is larger and these fields are identical:
 1. `region`
 2. `platform`
-3. 'gameFilename
+3. 'gameFilename`
 4. `manualFilename`
 5. `musicFilename`
 
@@ -67,6 +67,17 @@ These dummy `egg`s have the same game/music/manual files as their base Japanese 
 
 ### Region determination
 
+An archive will be marked as `World` if
+1. It's a region 1 (English/World) `egg`
+2. It's a region 0 (Japan) `egg` with exactly one `egg` in another region (determined by having identical files)
+
+An archive will be marked as `Unknown` if
+1. It's a region 0 `egg` with multiple `egg`s in other regions
+2. It has a region that is not 0 or 1
+
+The purpose of the `Uknown` region is simply to alert the datter that an easy determination can't be made and human attention is needed.
+
+If an archive is not marked as `World` or `Uknown`, it will be marked as `Japan`.
 
 
 ### Parent/clone selection
