@@ -64,7 +64,16 @@ An egg is determined to be a newer release of the current egg if it's `productId
 
 Furthermore, there is a check to see if this is simply a dummy egg used for showing an English store page.
 These dummy eggs have the same game/music/manual files as their base Japanese game, and therefore are out of scope for datting.
-An egg is determined to be a dummy if it has no unique files of it's own.
+An egg is determined to be a dummy if it is region 1 and has no unique files of it's own.
+
+### Revision determination
+
+Multiple eggs are considered revisions of each other if the set {game_filename, manual_filename, music_filename} is different while the following fields are identical:
+1. `region`
+2. `platform`
+3. `title`
+
+Revision 0 is the egg with the lowest `productId`, rev 1 is the next highest, etc.
 
 ### Region determination
 
