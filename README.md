@@ -66,6 +66,8 @@ Furthermore, there is a check to see if this is simply a dummy egg used for show
 These dummy eggs have the same game/music/manual files as their base Japanese game, and therefore are out of scope for datting.
 An egg is determined to be a dummy if it is region 1 and has no unique files of it's own.
 
+The archive number is simply sequential by processing order, which is determined by sorting productId ascending.
+
 ### Revision determination
 
 Multiple eggs are considered revisions of each other if the set {game_filename, manual_filename, music_filename} is different while the following fields are identical:
@@ -97,3 +99,17 @@ The parent is the one with the lower `digital_serial` (== `productId`)
 
 This logic is simple because it occurs last, after all the archives have been created.
 See the archive selection logic to understand more.
+
+### Other attributes
+
+#### `d_date` (dump date)
+
+Pulled from the `date` header from the HTML response headers of the game file.
+
+#### `digital_serial1`
+
+Set to the `productID`
+
+#### `additional`
+
+Set to the value of the `platform` egg field
