@@ -58,7 +58,7 @@ An `egg` will be associated with an archive if:
 An egg is determined to be a newer release of the current egg if it's `productId` is larger and these fields are identical:
 1. `region`
 2. `platform`
-3. 'gameFilename`
+3. `gameFilename`
 4. `manualFilename`
 5. `musicFilename`
 
