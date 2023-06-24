@@ -49,6 +49,26 @@ python main.py dat \
 
 ## dat generation logic
 
+### Archive selection
+
+An `egg` will be associated with an archive if:
+1. It has files associated with it that were detected during the file hashing phase
+2. There are no newer releases of that `egg` that are identical to it
+
+An `egg` is determined to be a newer release of the current `egg` if it's `productId` is larger and these fields are identical:
+1. `region`
+2. `platform`
+3. 'gameFilename
+4. `manualFilename`
+5. `musicFilename`
+
+Furthermore, there is a check to see if this is simply a dummy `egg` used for showing an English store page.
+These dummy `egg`s have the same game/music/manual files as their base Japanese game, and therefore are out of scope for datting.
+
+### Region determination
+
+
+
 ### Parent/clone selection
 
 Two or more archives are considered clones of each other if the archive title is identical (whoa).
