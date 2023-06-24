@@ -46,3 +46,13 @@ To run the datting process, use the `dat` subcommand:
 python main.py dat \
 <dumper's name> <path\to\download\destination> <path\to\data.json> <path\to\romanization.csv> <path\to\output\to>
 ```
+
+## dat generation logic
+
+### Parent/clone selection
+
+Two or more archives are considered clones of each other if the archive title is identical (whoa).
+The parent is the one with the lower `digital_serial` (== `productId`)
+
+This logic is simple because it occurs last, after all the archives have been created.
+See the archive selection logic to understand more.
