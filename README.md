@@ -64,6 +64,7 @@ An egg is determined to be a newer release of the current egg if it's `productId
 
 Furthermore, there is a check to see if this is simply a dummy egg used for showing an English store page.
 These dummy eggs have the same game/music/manual files as their base Japanese game, and therefore are out of scope for datting.
+An egg is determined to be a dummy if it has no unique files of it's own.
 
 ### Region determination
 
