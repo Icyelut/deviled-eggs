@@ -145,7 +145,7 @@ def find_english_releases_for_file(filename, server_json, egg, filename_key):
         return []
     return [x for x in server_json if
             x["productId"] != egg["productId"] and x[filename_key] == filename and x[
-                "region"] == 1]
+                "region"] != 0]
 
 
 def find_jpn_releases_for_file(filename, server_json, egg, filename_key):
@@ -170,6 +170,14 @@ def find_japanese_releases(game_filename, manual_filename, music_filename, serve
                    + find_jpn_releases_for_file(music_filename, server_json, egg, "musicFilename")
 
     return jpn_releases
+
+
+def has_unique_files(game_filename, manual_filename, music_filename, server_json, egg):
+    unique_game_file = game_filename != "" and find_jpn_releases_for_file(game_filename, server_json, egg, "gameFilename") == 0
+    unique_manual_file = manual_filename != "" and find_jpn_releases_for_file(manual_filename, server_json, egg, "manualFilename") == 0
+    unique_music_file = music_filename != "" and find_jpn_releases_for_file(music_filename, server_json, egg, "musicFilename") == 0
+
+    return unique_game_file or unique_manual_file or unique_music_file
 
 
 def get_dump_date_from_headers(filename, header_files_dict):
@@ -306,8 +314,11 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
             if len(japanese_releases) > 0:
                 for release in japanese_releases:
                     print(
-                        f"Found English page (id={egg['productId']}) of Japanese (id={release['productId']}), skipping...")
-                continue
+                        f"Found English page (id={egg['productId']}) of Japanese (id={release['productId']})")
+
+                if not has_unique_files(game_filename, manual_filename, music_filename, server_json, egg):
+                    print(f"INFO: English release product id={egg['productId']}) has no unique files compared to Japanese releases, skipping...")
+                    continue
             else:
                 print(f"Found region 1 release without a region 0 release: id={egg['productId']}")
 
@@ -319,7 +330,7 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
         elif egg["region"] == 0 and len(english_releases) > 1:
             for release in english_releases:
                 print(
-                    f"WARNING: Found region 0 release id={egg['productId']} with multiple ({len(english_releases)}) English releases: {release['productId']}")
+                    f"WARNING: Found region 0 release id={egg['productId']} with multiple ({len(english_releases)}) non-Japan releases: {release['productId']}")
             region = "Unknown"
         else:
             print(f"WARNING: Found unknown region {egg['region']} for id={egg['productId']}")
@@ -342,7 +353,14 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
 
         dump_date = get_dump_date_from_headers(game_filename, header_files_dict)
 
-        romanization_dict = [x for x in csv_lines if x["productId"] == egg["productId"]][0]
+        romanization_dict_list = [x for x in csv_lines if x["productId"] == egg["productId"]]
+
+        if len(romanization_dict_list) == 0:
+            print(f"ERROR: Missing romanization for productId {egg['productId']}")
+            raise ValueError(f"ERROR: Missing romanization for productId {egg['productId']}")
+
+        romanization_dict = romanization_dict_list[0]
+
 
         number = f"{idx:04}"
 
@@ -357,7 +375,7 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
             "@project": "No-Intro",
             "@originalformat": "",
             "@nodump": 0,
-            "@tool": "Custom",
+            "@tool": "deviled-eggs",
             "@origin": "CDN",
             "@comment1": "",
             "@comment2": f"{comment2}[Extra credits: Bestest, Eintei, luigi auriemma, proffrink, and Shadów]",
@@ -443,7 +461,8 @@ def generate_xml(filename, files_list):
 
 
 def generate_game_xml(game_files):
-    generate_xml('games.xml', game_files)
+    timenow = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    generate_xml(f'games_{timenow}.xml', game_files)
 
 
 def crosscheck_files(game_dat_list, file_list):
@@ -474,8 +493,15 @@ def dat(parsed_args):
     files_hashes_dict = {}
     header_files_dict = {}
     for x in files_hashes:
-        files_hashes_dict[x[0]] = {"size": x[1], "crc32": x[2], "md5": x[3], "sha1": x[4], "sha256": x[5]}
+        files_hashes_dict[x[0]] = {"filename": x[0], "size": x[1], "crc32": x[2], "md5": x[3], "sha1": x[4], "sha256": x[5]}
         header_files_dict[x[0]] = os.path.join(parsed_args.cdn_dir, f"{x[0]}_headers.txt")
+
+    timenow = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    with open(f"hashes_{timenow}.csv", "w", encoding="utf8", newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, delimiter=",", quotechar='"', fieldnames=["filename", "size", "crc32", "md5", "sha1", "sha256"])
+        writer.writeheader()
+
+        writer.writerows(files_hashes_dict.values())
 
     print("Compiling dump info...")
     game_files = assemble_file_info(server_json, csv_lines, files_hashes_dict, parsed_args.dumper, header_files_dict)
@@ -487,10 +513,12 @@ def dat(parsed_args):
     print("Generating DATs...")
     generate_game_xml(game_files)
 
-    print("Generating headers CSV...")
+    print("Making sure all files have been datted...")
     crosscheck_files(game_files, [x[0] for x in files_hashes])
 
-    with open("headers.csv", "w", encoding="utf8", newline='') as csvfile:
+    print("Generating headers CSV...")
+
+    with open(f"headers_{timenow}.csv", "w", encoding="utf8", newline='') as csvfile:
         writer = csv.DictWriter(csvfile, delimiter=",", quotechar='"', fieldnames=["filename", "header file"])
         writer.writeheader()
 
@@ -499,7 +527,6 @@ def dat(parsed_args):
 
         writer.writerows(files)
 
-    print("Making sure all files have been datted...")
 
     print("Done")
 
@@ -681,7 +708,7 @@ def download_with_headers(url, path, percent_complete):
 
 def get_purchased(username, password):
     r = requests.post(
-        'http://www.amusement-center.com/user/dcp/getcontentslist.cgi',
+        'http://api.amusement-center.com/api/dcp/v1/getcontentslist',
         headers={'User-Agent': USER_AGENT},
         data={
             'userid': username,
@@ -691,10 +718,11 @@ def get_purchased(username, password):
     if not r.status_code == 200:
         raise ConnectionError("Could not get list of purchased content.")
 
-    with open('server_response.bin', 'w+b') as f:
+    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    with open(f'server_response_{timestamp}.bin', 'w+b') as f:
         f.write(r.content)
 
-    with open('response_headers.txt', 'w') as f:
+    with open(f'response_headers_{timestamp}.txt', 'w') as f:
         f.write(str(r.headers))
 
     data = r.content
@@ -784,7 +812,7 @@ def get_server_json():
         password = input("Password: ")
         entries = get_purchased(username, password)
 
-    filename = f"{time.time()}_data.json"
+    filename = f"data_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.json"
 
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(entries, f, ensure_ascii=False, indent=4)
@@ -800,7 +828,7 @@ def download(args):
 
     file_list = generate_file_list(server_json)
     download_results = [
-        download_with_headers(f'http://www.amusement-center.com/productfiles/EGGFILES/{x}', "I:\\egg\\redownload",
+        download_with_headers(f'http://www.amusement-center.com/productfiles/EGGFILES/{x}', args.dest,
                               (idx - 1) / len(file_list) * 100) for idx, x in enumerate(file_list, start=1)]
     # print(path)
 
@@ -835,6 +863,9 @@ if __name__ == '__main__':
     dat_parser = subparsers.add_parser("dat", help="No-intro dat generator")
     dat_parser.add_argument("dumper",
                             help="Put your name!")
+
+    dat_parser.add_argument("--hash_csv", metavar="<hash csv>", type=pathlib.Path,
+                            help="Use a hashes_***.csv from a previous run to skip previously hashed files")
 
     dat_parser.add_argument("cdn_dir", metavar="<CDN files path>", type=pathlib.Path,
                             help="Full path to the folder with the actual .bin files as a flat directory (no subfolders)")
