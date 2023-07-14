@@ -113,3 +113,16 @@ Set to the `productID`
 #### `additional`
 
 Set to the value of the `platform` egg field
+
+### Anomalies
+
+#### Filename discrepancies
+
+There are some files that have filenames in the metadata that don't match the filenames in CDN.
+For datting purposes, these are hardcoded in to link the metadata to the CDN filename without need to modify the metadata, and the CDN filename is used in the DAT.
+A comment is left in the `comment2` field: `Server JSON incorrectly names this as <metadata filename>`
+
+| Metadata Filename | Actual (CDN) Filename |
+| ----------------- | --------------------- |
+| COM3008.bin       | COM3008a.bin          |
+| ECOM3005.bin      | COM3005a.bin          |
