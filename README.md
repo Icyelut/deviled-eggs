@@ -167,7 +167,7 @@ They belong to project pages that no longer exist.
 | STW1003a.bin      | 173         |
 | BOT3008a.bin      | 765         |
 | SKP0011m.bin      | 1044        |
-| COM5032a.bin      | 1265        |
+| COM5032a.bin      | 1264, 1265  |
 | COM5032m.bin      | 1264, 1265  |
 | COM5033a.bin      | 1266        |
 | COM5033m.bin      | 1266        |
@@ -186,10 +186,3 @@ They belong to project pages that no longer exist.
 | ETG0008a.bin      | 1833        |
 | ETG0008m.bin      | 1833        |
 
-#### Missing headers
-
-These files were downloaded before headers were saved, and subsequently went 404 before we could grab the headers.
-
-| Filename          | `productId` | Title            |
-| ----------------- | ----------- | -----------      |
-|       |          |  |
