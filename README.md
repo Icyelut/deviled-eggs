@@ -166,6 +166,7 @@ These files were not available when this effort began, and are thus completely M
 
 Some files just give us 404's when we try to download them now.
 They belong to project pages that no longer exist.
+At this time, this list matches the missing file list above.
 
 | Filename          | `productId` |
 | ----------------- | ----------- |
