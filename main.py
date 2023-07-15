@@ -626,6 +626,9 @@ def check_for_older_headers(new_headers, filepath, header_filepath):
 
 
 def move_older_file(filepath, header_filepath):
+    if not os.path.exists(header_filepath):
+        return False
+    print("Found older file, moving...")
     try:
         last_modified_epoch = get_last_modified_as_epoch(header_filepath)
         new_folder = os.path.join(pathlib.Path(filepath).parent, f'{pathlib.Path(filepath).name}_{last_modified_epoch}')
@@ -642,9 +645,10 @@ def move_older_file(filepath, header_filepath):
     shutil.move(filepath, os.path.join(new_folder, pathlib.Path(filepath).name))
     shutil.move(header_filepath, os.path.join(new_folder, pathlib.Path(header_filepath).name))
 
+    print(f"Old file moved to {new_folder}")
 
-def download_with_headers(url, path, percent_complete):
-    print("\r{0:1.2f}% done".format(percent_complete), end="")
+
+def download_with_headers(url, path, index, total):
     wrote_file = False
     headers = {'user-agent': 'c384da2W9f73dz20403d'}
 
@@ -653,9 +657,12 @@ def download_with_headers(url, path, percent_complete):
     target_headers_path = os.path.join(path, f"{local_filename}_headers.txt")
     response_headers = None
 
+    print(f"({index}/{total}): {local_filename}")
+
     retries = 3
     success = False
     for n in range(retries):
+
         with requests.get(url, stream=True, headers=headers) as r:
             response_headers = r.headers
             try:
@@ -664,41 +671,43 @@ def download_with_headers(url, path, percent_complete):
             except HTTPError as exc:
                 code = exc.response.status_code
 
-                if code in [429, 500, 502, 503, 504]:
+                if code == 404:
+                    print(f"[WARNING] Got 404 for {local_filename}")
+                    break
+                elif code != 200:
                     # retry after n seconds
-                    print(f"\n[WARNING] Got {code} for {local_filename}, retrying after {n + 1} seconds")
+                    print(f"[WARNING] Got {code} for {local_filename}, retrying after {n + 1} seconds")
                     time.sleep(n + 1)
                     continue
-                elif code in [404]:
-                    print(f"\n[WARNING] Got 404 for {local_filename}")
-                    break
+
 
                 raise
 
-        if check_for_older_headers(response_headers, target_path, target_headers_path):
-            try:
-                move_older_file(target_path, target_headers_path)
-            except FileNotFoundError:
-                pass
+            if check_for_older_headers(response_headers, target_path, target_headers_path):
+                try:
+                    move_older_file(target_path, target_headers_path)
+                except FileNotFoundError:
+                    pass
+                #if not os.path.exists(header_filepath):
+                #    return False
+                with open(target_path, 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        # If you have chunk encoded response uncomment if
+                        # and set chunk_size parameter to None.
+                        # if chunk:
+                        f.write(chunk)
 
-            with open(target_path, 'wb') as f:
-                for chunk in r.iter_content(chunk_size=8192):
-                    # If you have chunk encoded response uncomment if
-                    # and set chunk_size parameter to None.
-                    # if chunk:
-                    f.write(chunk)
+                    wrote_file = True
 
-                wrote_file = True
+                    stripped = [(key, x) for key, x in response_headers.items()]
 
-                stripped = [(key, x) for key, x in response_headers.items()]
-
-                with open(target_headers_path, newline="\r\n", mode="w") as of:
-                    lines = [f"{name}: {value}\n" for name, value in stripped]
-                    lines.append("\n")
-                    of.writelines(lines)
+                    with open(target_headers_path, newline="\r\n", mode="w") as of:
+                        lines = [f"{name}: {value}\n" for name, value in stripped]
+                        lines.append("\n")
+                        of.writelines(lines)
 
     if not success:
-        print(f"\n[WARNING] Skipping {local_filename} after reaching maximum retries")
+        print(f"[WARNING] Skipping {local_filename} after reaching maximum retries")
 
     return response_headers, local_filename, wrote_file
 
@@ -719,11 +728,17 @@ def get_purchased(username, password):
         raise ConnectionError("Could not get list of purchased content.")
 
     timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-    with open(f'server_response_{timestamp}.bin', 'w+b') as f:
+    filename = f'server_response_{timestamp}.bin'
+    with open(filename, 'w+b') as f:
         f.write(r.content)
 
-    with open(f'response_headers_{timestamp}.txt', 'w') as f:
+    print(f"Wrote to {filename}")
+
+    filename = f'response_headers_{timestamp}.txt'
+    with open(filename, 'w') as f:
         f.write(str(r.headers))
+
+    print(f"Wrote to {filename}")
 
     data = r.content
     data = data.decode("euc_jisx0213")
@@ -803,19 +818,31 @@ def parse_content_entry(data):
                 for key, transformer in CONTENT_PROPERTIES}
 
 
-def get_server_json():
+def get_server_json(args):
     if USE_SERVER_RESPONSE_FILE:
         entries = get_purchased_from_file()
     else:
-        print("Please enter your Project EGG...")
-        username = input("Username: ")
-        password = input("Password: ")
+        if args.pw is None or args.user is None:
+            print("Please enter your Project EGG...")
+
+        if args.user is None:
+            username = input("Username: ")
+        else:
+            username = args.user
+
+        if args.pw is None:
+            password = input("Password: ")
+        else:
+            password = args.pw
+
         entries = get_purchased(username, password)
 
     filename = f"data_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.json"
 
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(entries, f, ensure_ascii=False, indent=4)
+
+    print(f"Wrote to {filename}")
 
     return filename
 
@@ -824,12 +851,18 @@ def download(args):
     if args.server_json is not None:
         server_json = args.server_json
     else:
-        server_json = get_server_json()
+        server_json = get_server_json(args)
+
+    if args.dest is not None:
+        dest = args.dest
+        os.makedirs(dest, exist_ok=True)
+    else:
+        dest = "."
 
     file_list = generate_file_list(server_json)
     download_results = [
-        download_with_headers(f'http://www.amusement-center.com/productfiles/EGGFILES/{x}', args.dest,
-                              (idx - 1) / len(file_list) * 100) for idx, x in enumerate(file_list, start=1)]
+        download_with_headers(f'http://www.amusement-center.com/productfiles/EGGFILES/{x}', dest,
+                              idx, len(file_list)) for idx, x in enumerate(file_list, start=1)]
     # print(path)
 
 
@@ -847,6 +880,10 @@ if __name__ == '__main__':
     download_parser = subparsers.add_parser("download", help="File download mode")
     download_parser.add_argument("--server_json", metavar="<server response JSON path>", type=is_file(True),
                                  help="Full path to the JSON response file with game metadata", required=False)
+    download_parser.add_argument("--user", metavar="<username>",
+                                 help="Your Project EGG user account username", required=False)
+    download_parser.add_argument("--pw", metavar="<password>",
+                                 help="Your Project EGG user account password", required=False)
     download_parser.add_argument("dest", metavar="<destination path>", type=pathlib.Path,
                                  help="Full path to the folder where the files should be saved")
     download_parser.set_defaults(func_to_run=download)
