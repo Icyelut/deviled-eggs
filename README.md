@@ -124,5 +124,72 @@ A comment is left in the `comment2` field: `Server JSON incorrectly names this a
 
 | Metadata Filename | Actual (CDN) Filename |
 | ----------------- | --------------------- |
-| COM3008.bin       | COM3008a.bin          |
 | ECOM3005.bin      | COM3005a.bin          |
+| COM3008.bin       | COM3008a.bin          |
+
+
+#### Missing files
+
+These files were not available when this effort began, and are thus completely MIA at this time.
+
+| Filename          | `productId` | Title                                                         |
+| ----------------- | ----------- | -----------                                                   |
+| STW1003a.bin      | 173         | Shiro to Kuro no Densetsu - Hyakki-hen (Ongaku Data nomi)     
+| BOT3008a.bin      | 765         | T.N.T.                                                        
+| SKP0011m.bin      | 1044        | Ironclad
+| COM5032a.bin      | 1264, 1265  | Jino-Brodiaea's Wander Number, After Devil Force Gaiden - The Sword Battle of Quada 
+| COM5032m.bin      | 1264, 1265  | Jino-Brodiaea's Wander Number, After Devil Force Gaiden - The Sword Battle of Quada 
+| COM5033a.bin      | 1266        | Gensei Haiyuuki
+| COM5033m.bin      | 1266        | Gensei Haiyuuki
+| COM5034a.bin      | 1267        | DEVIL FORCE III: Ken to Hanataba
+| COM5034m.bin      | 1267        | DEVIL FORCE III: Ken to Hanataba
+| COM5035a.bin      | 1268        | After Devil Force - Kyou-ou no Koukeisha
+| COM5035m.bin      | 1268        | After Devil Force - Kyou-ou no Koukeisha
+| COM5036a.bin      | 1269        | Geo Conflict 3 - Hell's Gate Crusaders
+| COM5036m.bin      | 1269        | Geo Conflict 3 - Hell's Gate Crusaders
+| COM5038a.bin      | 1270        | Daikaisen
+| COM5038m.bin      | 1270        | Daikaisen
+| COM5039a.bin      | 1271        | Quiz Tsunahiki Champ
+| COM5039m.bin      | 1271        | Quiz Tsunahiki Champ
+| COM5040a.bin      | 1272        | Poly Poly! Speed Daisakusen
+| COM5040m.bin      | 1272        | Poly Poly! Speed Daisakusen
+| ETG0008a.bin      | 1833        | Sword Dancer – Kyoujin no Megami                                                        
+| ETG0008m.bin      | 1833        | Sword Dancer – Kyoujin no Megami
+
+
+#### 404 files
+
+Some files just give us 404's when we try to download them now.
+They belong to project pages that no longer exist.
+
+| Filename          | `productId` |
+| ----------------- | ----------- |
+| STW1003a.bin      | 173         |
+| BOT3008a.bin      | 765         |
+| SKP0011m.bin      | 1044        |
+| COM5032a.bin      | 1265        |
+| COM5032m.bin      | 1264, 1265  |
+| COM5033a.bin      | 1266        |
+| COM5033m.bin      | 1266        |
+| COM5034a.bin      | 1267        |
+| COM5034m.bin      | 1267        |
+| COM5035a.bin      | 1268        |
+| COM5035m.bin      | 1268        |
+| COM5036a.bin      | 1269        |
+| COM5036m.bin      | 1269        |
+| COM5038a.bin      | 1270        |
+| COM5038m.bin      | 1270        |
+| COM5039a.bin      | 1271        |
+| COM5039m.bin      | 1271        |
+| COM5040a.bin      | 1272        |
+| COM5040m.bin      | 1272        |
+| ETG0008a.bin      | 1833        |
+| ETG0008m.bin      | 1833        |
+
+#### Missing headers
+
+These files were downloaded before headers were saved, and subsequently went 404 before we could grab the headers.
+
+| Filename          | `productId` | Title            |
+| ----------------- | ----------- | -----------      |
+|       |          |  |
