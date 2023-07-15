@@ -1,6 +1,7 @@
 import argparse
 import os.path
 import pathlib
+from random import randint
 import shutil
 import sys
 import csv
@@ -375,7 +376,7 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
             "@project": "No-Intro",
             "@originalformat": "",
             "@nodump": 0,
-            "@tool": "deviled-eggs",
+            "@tool": "deviled-eggs v1.0",
             "@origin": "CDN",
             "@comment1": "",
             "@comment2": f"{comment2}[Extra credits: Bestest, Eintei, luigi auriemma, proffrink, and Shadów]",
@@ -482,7 +483,7 @@ def dat(parsed_args):
         reader = csv.DictReader(csvfile, delimiter=",", quotechar='"')
         csv_lines = [x for x in reader]
 
-    print("Reading server JSON...")
+    print(f"Reading server JSON {parsed_args.server_json}...")
     server_json = json.loads(open(parsed_args.server_json, encoding="utf8").read())
 
     print("Checking for missing romanizations...")
@@ -538,7 +539,7 @@ def romanize(parsed_args):
         reader = csv.DictReader(csvfile, delimiter=",", quotechar='"')
         csv_lines = [x for x in reader]
 
-    print("Reading server JSON...")
+    print(f"Reading server JSON {parsed_args.server_json}...")
     server_json = json.loads(open(parsed_args.server_json, encoding="utf8").read())
 
     print("Checking for missing romanizations...")
@@ -546,7 +547,7 @@ def romanize(parsed_args):
 
 
 def generate_file_list(json_file):
-    print("Reading server JSON...")
+    print(f"Reading server JSON {os.path.basename(json_file)}...")
     server_json = json.loads(open(json_file, encoding="utf8").read())
 
     file_list = {egg["gameFilename"] for egg in server_json if egg["gameFilename"] != ""} | \
@@ -653,6 +654,15 @@ def download_with_headers(url, path, index, total):
     headers = {'user-agent': 'c384da2W9f73dz20403d'}
 
     local_filename = url.split('/')[-1]
+
+
+    if local_filename == "COM3008.bin":
+        local_filename = "COM3008a.bin"
+        url = url.replace("COM3008.bin", "COM3008a.bin")
+    elif local_filename == "ECOM3005a.bin":
+        local_filename = "COM3005a.bin"
+        url = url.replace("ECOM3005a.bin", "COM3005a.bin")
+
     target_path = os.path.join(path, local_filename)
     target_headers_path = os.path.join(path, f"{local_filename}_headers.txt")
     response_headers = None
@@ -662,7 +672,7 @@ def download_with_headers(url, path, index, total):
     retries = 3
     success = False
     for n in range(retries):
-
+        time.sleep(randint(1, 5))
         with requests.get(url, stream=True, headers=headers) as r:
             response_headers = r.headers
             try:
@@ -705,6 +715,11 @@ def download_with_headers(url, path, index, total):
                         lines = [f"{name}: {value}\n" for name, value in stripped]
                         lines.append("\n")
                         of.writelines(lines)
+            else:
+                print("|--------> Exists, skipping...")
+                break
+
+
 
     if not success:
         print(f"[WARNING] Skipping {local_filename} after reaching maximum retries")
