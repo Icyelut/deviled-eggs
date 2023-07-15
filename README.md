@@ -9,6 +9,11 @@ This will ask you for your ProjectEGG account username and password.
 python main.py download <path\to\download\destination>
 ```
 
+You can specifiy username and password in advance.
+```
+python main.py download --user <username> --pw <password> <path\to\download\destination>
+```
+
 If you already have the metadata file `data.json`, then you can pass the path with 
 
 ```
