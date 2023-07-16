@@ -857,7 +857,7 @@ CONTENT_PROPERTIES = (
     ('year',              str),
     ('mystery1',          str),
     ('gameFilename',      str),
-    ('mystery2',          str), # Some sort of date...
+    ('mystery2',          str), # Last file update date, YYYYMMDDhhmm
     ('mystery3',          str),
     ('owned',             lambda s: bool(int(s))),
     ('thumbnailFilename', str),
