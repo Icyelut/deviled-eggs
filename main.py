@@ -10,6 +10,7 @@ import time
 from io import StringIO
 from os import SEEK_END
 from urllib.parse import unquote_plus
+from itertools import islice
 import http.cookiejar
 
 import pytz
@@ -271,9 +272,9 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
         if game_filename == 'COM3008.bin':
             game_filename = 'COM3008a.bin'
             comment2 = "Server JSON incorrectly names this as COM3008.bin\n"
-        elif game_filename == "ECOM3005.bin":
+        elif game_filename == "ECOM3005a.bin":
             game_filename = "COM3005a.bin"
-            comment2 = "Server JSON incorrectly names this as ECOM3005.bin\n"
+            comment2 = "Server JSON incorrectly names this as ECOM3005a.bin\n"
         else:
             comment2 = ""
 
@@ -377,9 +378,9 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
             "@originalformat": "",
             "@nodump": 0,
             "@tool": "deviled-eggs v1.0",
-            "@origin": "CDN",
+            "@origin": "",
             "@comment1": "",
-            "@comment2": f"{comment2}[Extra credits: Bestest, Eintei, luigi auriemma, proffrink, and Shadów]",
+            "@comment2": f"{comment2}",
             "@link1": "",
             "@link1_public": 0,
             "@link2": "",
@@ -453,7 +454,23 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
     return combined
 
 
+def chunk(it, size):
+    it = iter(it)
+    return iter(lambda: tuple(islice(it, size)), ())
+
+
+def generate_split_xml(filename, files_list):
+    # Just do some guesswork since we don't know how large the file will be until it's already written
+    archive_limit = 500
+    chunk_iter = chunk(files_list, archive_limit)
+    for idx, chunk_item in enumerate(chunk_iter):
+        basename = filename.split(".xml")[0]
+        new_name = f"{basename}_{idx}.xml"
+        generate_xml(new_name, chunk_item)
+
+
 def generate_xml(filename, files_list):
+    print(f"Writing {filename}...")
     json_str = json.dumps({"game": files_list})
 
     schema = xmlschema.XMLSchema('example_upload_custom.xsd.xml')
@@ -463,7 +480,7 @@ def generate_xml(filename, files_list):
 
 def generate_game_xml(game_files):
     timenow = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-    generate_xml(f'games_{timenow}.xml', game_files)
+    generate_split_xml(f'games_{timenow}.xml', game_files)
 
 
 def crosscheck_files(game_dat_list, file_list):
@@ -471,6 +488,24 @@ def crosscheck_files(game_dat_list, file_list):
     for f in file_list:
         if f not in just_the_filenames:
             print(f"WARNING: {f} is missing from the final dat!")
+
+
+def create_individual_json(files_list, server_json):
+    os.makedirs(".\\json", exist_ok=True)
+    result_list_for_csv = []
+    for file in files_list:
+        archive_no = file["archive"]["@number"]
+        product_id = file["source"][0]["serials"]["@digital_serial1"]
+        for egg in server_json:
+            if egg['productId'] == product_id:
+                json_str = json.dumps(egg)
+                filename = f".\\json\\{archive_no}.json"
+                with open(filename, "w") as outfile:
+                    outfile.write(json_str)
+
+                result_list_for_csv.append((archive_no, f"{archive_no}.json"))
+
+    return result_list_for_csv
 
 
 def dat(parsed_args):
@@ -516,6 +551,20 @@ def dat(parsed_args):
 
     print("Making sure all files have been datted...")
     crosscheck_files(game_files, [x[0] for x in files_hashes])
+
+    print("Generating individual JSON files...")
+    json_list = create_individual_json(game_files, server_json)
+
+    print("Generating JSON CSV...")
+
+    with open(f"json_{timenow}.csv", "w", encoding="utf8", newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, delimiter=",", quotechar='"', fieldnames=["archive", "json file"])
+        writer.writeheader()
+
+        files = [{"archive": x[0], "json file": x[1]} for x
+                 in json_list]
+
+        writer.writerows(files)
 
     print("Generating headers CSV...")
 
