@@ -192,3 +192,12 @@ At this time, this list matches the missing file list above.
 | ETG0008a.bin      | 1833        |
 | ETG0008m.bin      | 1833        |
 
+# Credits
+
+- **Eintei**: all the original reverse engineering and documentation that made this possible
+- **luigi auriemma**: the original data.json download script, which was incorporated into this one
+- **Bestest**: coordination and leadership for the official preservation effort, reverse engineering
+- **Hiccup**: datting support and advice
+- **proffrink**: scraping, research
+- **Shadów**: reverse engineering
+- **Icyelut** (me): this script, romanization
