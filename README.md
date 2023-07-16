@@ -195,7 +195,7 @@ At this time, this list matches the missing file list above.
 # Credits
 
 - **Eintei**: all the original reverse engineering and documentation that made this possible
-- **luigi auriemma**: the original data.json download script, which was incorporated into this one
+- **obskyr**: the original data.json download script, which was incorporated into this one
 - **Bestest**: coordination and leadership for the official preservation effort, reverse engineering
 - **Hiccup**: datting support and advice
 - **proffrink**: scraping, research
