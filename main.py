@@ -932,7 +932,7 @@ def download(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description="projectEGG_to_XML v0.1: Takes CDN files and romanization CSV and outputs an XML file for DoM "
+        description="deviled-eggs v1.0: Tools for retrieving, romanizing, and datting the Project EGG files "
                     "import",
         epilog="Copyright 2023-01-15 - Icyelut. GPLv3",
         fromfile_prefix_chars='@')
