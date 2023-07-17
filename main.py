@@ -202,7 +202,8 @@ def assemble_file_dat_info(filename, header_files_dict, files_hashes_dict, filte
         content_length = headers["content-length"]
 
         if int(content_length) != target_file["size"]:
-            print(f"[WARNING] File size ({content_length}) doesn't match content-length header ({target_file['size']}) for {filename}")
+            print(f"[WARNING] File size ({content_length}) doesn't match content-length header ({target_file['size']}) "
+                  f"for {filename}")
 
     return {
         "@forcename": filename,
@@ -454,15 +455,15 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
     return combined
 
 
-def chunk(it, size):
+def chunk_it(it, size):
     it = iter(it)
     return iter(lambda: tuple(islice(it, size)), ())
 
 
 def generate_split_xml(filename, files_list):
     # Just do some guesswork since we don't know how large the file will be until it's already written
-    archive_limit = 500
-    chunk_iter = chunk(files_list, archive_limit)
+    archive_limit = 5000
+    chunk_iter = chunk_it(files_list, archive_limit)
     for idx, chunk_item in enumerate(chunk_iter):
         basename = filename.split(".xml")[0]
         new_name = f"{basename}_{idx}.xml"
@@ -653,6 +654,47 @@ def get_access_date_as_epoch(header_filepath):
     last_modified_epoch = convert_last_modified_str(last_modified)
 
     return last_modified_epoch
+
+def check_for_older_last_modified(new_headers, filepath, header_filepath):
+    try:
+        last_modified_epoch = get_last_modified_as_epoch(header_filepath)
+    except KeyError:
+        # No last-modified header
+        print("\nNo last-modified")
+        return True
+    except FileNotFoundError:
+        # Headers don't exist (the file has probably never been downloaded)
+        return True
+
+    if "last-modified" in new_headers.keys():
+        new_last_modified_epoch = convert_last_modified_str(new_headers["last-modified"])
+    else:
+        # No last-modified header
+        return True
+
+    return last_modified_epoch < new_last_modified_epoch
+
+
+def check_for_changed_content_length(new_headers, filepath, header_filepath):
+    try:
+        headers = get_dict_from_http1(header_filepath)
+
+        content_length = headers["content-length"]
+    except KeyError:
+        # No content-length header
+        print("\nNo content-length")
+        return True
+    except FileNotFoundError:
+        # Headers don't exist (the file has probably never been downloaded)
+        return True
+
+    if "content-length" in new_headers.keys():
+        new_content_length = new_headers["last-modified"]
+    else:
+        # No content-length header
+        return True
+
+    return content_length != new_content_length
 
 
 def check_for_older_headers(new_headers, filepath, header_filepath):
@@ -934,7 +976,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="deviled-eggs v1.0: Tools for retrieving, romanizing, and datting the Project EGG files "
                     "import",
-        epilog="Copyright 2023-01-15 - Icyelut. GPLv3",
+        epilog="Copyright 2023-01-15 - Icyelut, obskyr. GPLv3",
         fromfile_prefix_chars='@')
 
     parser.set_defaults(func_to_run=dat)
