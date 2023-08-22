@@ -118,6 +118,7 @@ def has_newer_releases(game_filename, manual_filename, music_filename, server_js
 
     return len(newer_releases_list) > 0
 
+
 def find_revisions(game_filename, manual_filename, music_filename, server_json, egg):
     # If the title, system, and region are the same and have a different combination of {game, manual, music}
     # then it's a revision
@@ -128,18 +129,19 @@ def find_revisions(game_filename, manual_filename, music_filename, server_json, 
             int(x["productId"]) != int(egg["productId"])
             and x["region"] == egg["region"]
             and x["platform"] == egg["platform"]
-            and x["title"] == egg["title"]
+            and x["romanized_title"] == egg["romanized_title"]
             and {x["gameFilename"], x["manualFilename"], x["musicFilename"]} !=
             {game_filename, manual_filename, music_filename}]
 
 
 def what_revision(egg, revisions):
-    sorted_revisions = sorted(revisions, key=lambda y: y["productId"])
+    sorted_revisions = sorted(revisions, key=lambda y: int(y["productId"]))
     for x, compare_egg in enumerate(sorted_revisions):
-        if int(compare_egg["productId"]) < int(egg["productId"]):
-            return x + 1
+        if int(compare_egg["productId"]) > int(egg["productId"]):
+            return x
 
-    return 0
+    # All other revisions have a lower productId, so this is the last revision
+    return len(sorted_revisions)
 
 
 def find_english_releases_for_file(filename, server_json, egg, filename_key):
@@ -245,7 +247,6 @@ def find_parent(game_files, egg):
 
 
 def assign_parent_clone(game_files):
-
     for game in game_files:
         parent_egg = find_parent(game_files, game)
 
@@ -255,7 +256,38 @@ def assign_parent_clone(game_files):
             game["archive"]["@clone"] = "P"
 
 
+def check_for_duplicate_archive_names(game_files):
+    for game in game_files:
+        platform = game["archive"]["@additional"]
+        name = game["archive"]["@name"]
+        revision = game["archive"]["@version1"]
+        number = game["archive"]["@number"]
+        region = game["archive"]["@region"]
 
+        for other_game in game_files:
+            other_number = other_game["archive"]["@number"]
+            other_platform = other_game["archive"]["@additional"]
+            other_name = other_game["archive"]["@name"]
+            other_revision = other_game["archive"]["@version1"]
+            other_region = other_game["archive"]["@region"]
+            if number != other_number and region == other_region and platform == other_platform and name == other_name and revision == other_revision:
+                print(f"[ERROR] Archive {number} name collides with archive {other_number}: {name} ({region}) ({platform}) ({revision})")
+
+
+def assign_romanization(server_json, csv_lines):
+
+    for egg in server_json:
+        romanization_dict_list = [x for x in csv_lines if x["productId"] == egg["productId"]]
+
+        if len(romanization_dict_list) == 0:
+            print(f"ERROR: Missing romanization for productId {egg['productId']}")
+            raise ValueError(f"ERROR: Missing romanization for productId {egg['productId']}")
+
+        romanization_dict = romanization_dict_list[0]
+        sanitized_name = romanization_dict['romanized'].replace('　', ' ').replace('  ', ' ').replace('–', '-').replace('–', '-')
+        egg["romanized_title"] = sanitized_name
+
+    return server_json
 
 
 def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header_files_dict):
@@ -263,6 +295,8 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
     combined = []
 
     server_json = sorted(server_json, key=lambda y: int(y["productId"]))
+
+    server_json = assign_romanization(server_json, csv_lines)
 
     for idx, egg in enumerate(server_json, start=1):
 
@@ -356,15 +390,6 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
 
         dump_date = get_dump_date_from_headers(game_filename, header_files_dict)
 
-        romanization_dict_list = [x for x in csv_lines if x["productId"] == egg["productId"]]
-
-        if len(romanization_dict_list) == 0:
-            print(f"ERROR: Missing romanization for productId {egg['productId']}")
-            raise ValueError(f"ERROR: Missing romanization for productId {egg['productId']}")
-
-        romanization_dict = romanization_dict_list[0]
-
-
         number = f"{idx:04}"
 
         details = {
@@ -413,13 +438,13 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
             "@regparent": "",
             "@mergeof": "",
             "@mergename": "",
-            "@name": f"{romanization_dict['romanized'].replace('　', ' ').replace('  ', ' ').replace('–', '-').replace('–', '-')}",
+            "@name": egg["romanized_title"],
             "@name_alt": f"{egg['title'].replace('　', ' ').replace('  ', ' ').replace('–', '-').replace('–', '-')}",
             "@region": region,
             "@languages": "Ja",
             "@showlang": 0,
             "@langchecked": "no",
-            "@version": revision_string,
+            "@version1": revision_string,
             "@devstatus": "",
             "@additional": f"{platform}",
             "@special1": "",
@@ -440,7 +465,7 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
             "@categories": category
         }
 
-        new_dict = {"@name": f"{romanization_dict['romanized']}",
+        new_dict = {"@name": egg["romanized_title"],
                     "archive": archive,
                     "source": source,
                     }
@@ -543,6 +568,8 @@ def dat(parsed_args):
     print("Compiling dump info...")
     game_files = assemble_file_info(server_json, csv_lines, files_hashes_dict, parsed_args.dumper, header_files_dict)
 
+    print("Checking for duplicate archive names...")
+    check_for_duplicate_archive_names(game_files)
 
     print("Assigning parent/clone relationships...")
     assign_parent_clone(game_files)

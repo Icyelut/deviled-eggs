@@ -21,7 +21,7 @@
                       <xs:attribute type="xs:string" name="languages"/>
                       <xs:attribute type="xs:byte" name="showlang"/>
                       <xs:attribute type="xs:string" name="langchecked"/>
-                      <xs:attribute type="xs:string" name="version"/>
+                      <xs:attribute type="xs:string" name="version1"/>
                       <xs:attribute type="xs:string" name="devstatus"/>
                       <xs:attribute type="xs:string" name="additional"/>
                       <xs:attribute type="xs:string" name="special1"/>
