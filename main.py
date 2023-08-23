@@ -298,6 +298,7 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
 
     server_json = assign_romanization(server_json, csv_lines)
 
+    skipped = 0
     for idx, egg in enumerate(server_json, start=1):
 
         game_filename = egg["gameFilename"]
@@ -325,11 +326,13 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
 
         if len(file_dat_info) == 0:
             print(f"WARNING: archive for product id {egg['productId']} has no dattable files, skipping...")
+            skipped = skipped + 1
             continue
 
         if has_newer_releases(game_filename, manual_filename, music_filename, server_json, egg):
             # Don't use older releases of a game
             print(f"WARNING: product id {egg['productId']} has newer releases, skipping...")
+            skipped = skipped + 1
             continue
 
         revisions = find_revisions(game_filename, manual_filename, music_filename, server_json, egg)
@@ -355,6 +358,7 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
 
                 if not has_unique_files(game_filename, manual_filename, music_filename, server_json, egg):
                     print(f"INFO: English release product id={egg['productId']}) has no unique files compared to Japanese releases, skipping...")
+                    skipped = skipped + 1
                     continue
             else:
                 print(f"Found region 1 release without a region 0 release: id={egg['productId']}")
@@ -390,7 +394,7 @@ def assemble_file_info(server_json, csv_lines, files_hashes_dict, dumper, header
 
         dump_date = get_dump_date_from_headers(game_filename, header_files_dict)
 
-        number = f"{idx:04}"
+        number = f"{idx - skipped:04}"
 
         details = {
             "@section": "Trusted Dump",
